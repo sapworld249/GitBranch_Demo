@@ -35,8 +35,10 @@ DATA g_obd        TYPE vbeln. " ERP Outbound Delivery
 DATA g_so         TYPE vbeln. " ERP Sales Order
 DATA g_ewmdel     TYPE /scdl/dl_docno_int.
 
+
 PARAMETERS p_lgnum TYPE /scwm/lgnum   " Warehouse
             OBLIGATORY.
+PARAMETERS p_vbeln TYPE vbeln OBLIGATORY.
 SELECT-OPTIONS s_obd    FOR g_obd.    " ERP Outbound Delivery
 SELECT-OPTIONS s_so     FOR g_so.     " Sales Order
 SELECT-OPTIONS s_ewmdel FOR g_ewmdel. " EWM Delivery
@@ -68,6 +70,15 @@ START-OF-SELECTION.
                           option    = ls_ewmdel-option
                           low       = ls_ewmdel-low
                           high      = ls_ewmdel-high )   ).
+
+  " Ship To Party
+  it_selection = VALUE /scwm/dlv_selection_tab( 
+						BASE it_selection  
+						( fieldname = /scdl/if_dl_logfname_c=>SC_LOCATIONNO_STPRT_H  
+						  sign      = ls_ewmdel-sign
+                          option    = ls_ewmdel-option
+                          low       = ls_ewmdel-low
+                          high      = ls_ewmdel-high ) ).
 
   s_read = VALUE #( data_retrival_only  = 'X' ).
   s_incl = VALUE #(  head_partyloc      = 'X'
