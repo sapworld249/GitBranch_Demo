@@ -1,5 +1,5 @@
 *&---------------------------------------------------------------------*
-*& Report ZDEMO_GET_INBOUND_DELIVERIES
+*& Report ZDEMO_GET_OUTBOUND_DELIVERIES
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
@@ -14,6 +14,9 @@ TYPES:
     partyno      TYPE /scdl/dl_partyno,   " Partner
     erpdel       TYPE /scdl/dl_refdocno,  " ERP Inbound Del
     erpdelitemno TYPE /scdl/dl_refitemno, " ERP Inbound Del Item
+    erppo        TYPE /scdl/dl_refdocno,  " ERP PO
+    erppoitemno  TYPE /scdl/dl_refitemno, " ERP PO tem
+    HBL          TYPE /scdl/dl_refdocno,  " HBL
     itemno       TYPE /scdl/dl_itemno,    " EWM Doc Item
     productno    TYPE /scdl/dl_productno, " Product
     batchno      TYPE /scdl/dl_batchno,   " Batch
@@ -127,8 +130,20 @@ START-OF-SELECTION.
           CATCH cx_sy_itab_line_not_found .
 
         ENDTRY.
+        TRY .
+            ls_refdoc = ls_item-refdoc[ refdoccat = 'PO' ].
+            s_final-erppo 		= ls_refdoc-refdocno.
+            s_final-erppoitemno = ls_refdoc-refitemno.
+          CATCH cx_sy_itab_line_not_found .
 
-        " Item - Product
+        ENDTRY.
+        TRY .
+            ls_refdoc = ls_item-refdoc[ refdoccat = 'HBL' ].
+            s_final-hbl 		= ls_refdoc-refdocno.
+          CATCH cx_sy_itab_line_not_found .
+
+        ENDTRY. 
+		" Item - Product
         s_final-itemno        = ls_items-itemno.
         s_final-productno     = ls_items-product-productno.
         s_final-batchno       = ls_items-product-batchno.
@@ -180,6 +195,9 @@ END-OF-SELECTION.
     lo_alv->get_columns( )->get_column( 'DOCNO' )->set_medium_text( 'EWM Delivery' ).
     lo_alv->get_columns( )->get_column( 'ERPDEL' )->set_medium_text( 'ERP Delivery' ).
     lo_alv->get_columns( )->get_column( 'ERPDELITEMNO' )->set_medium_text( 'ERP Del Item' ).
+    lo_alv->get_columns( )->get_column( 'ERPPO' )->set_medium_text( 'ERP PO' ).
+    lo_alv->get_columns( )->get_column( 'ERPPOITEMNO' )->set_medium_text( 'ERP PO Item' ).
+    lo_alv->get_columns( )->get_column( 'HBL' )->set_medium_text( 'HBL' ).
     lo_alv->get_columns( )->get_column( 'ITEMNO' )->set_medium_text( 'EWM Item No' ).
     lo_alv->get_columns( )->get_column( 'PARTYNO' )->set_medium_text( 'Ship From' ).
     lo_alv->get_columns( )->get_column( 'PRODUCT_TEXT' )->set_medium_text( 'Product Description' ).
